@@ -1,5 +1,7 @@
 package goinput
 
+import "fmt"
+
 //
 // A Filter. This is a function which transforms a value and returns the
 // results.
@@ -43,11 +45,21 @@ func NewValidationError(errs []error, children map[string]*ValidationError) *Val
 }
 
 //
-// Checks whether the map contains any validation errors - its a bit more
-// semmantically pleasing than checking the map's length directly
 //
-func (errs ValidationError) HasErrors() bool {
-	return len(errs.Errors) == 0 || len(errs.Children) == 0
+//
+func (errs ValidationError) Error() (errStr string) {
+
+	if !errs.Empty() {
+		errStr = fmt.Sprintf("%q, %q", errs.Errors, errs.Children)
+	}
+	return
+}
+
+//
+// Checks whether the map contains any validation errors or children.
+//
+func (errs ValidationError) Empty() bool {
+	return len(errs.Errors) == 0 && len(errs.Children) == 0
 }
 
 //
@@ -113,7 +125,7 @@ func (ig BasicInputGroup) FilterAndValidate() (filtered Input, errs *ValidationE
 
 	for fieldName, input := range ig {
 		filteredInput, valErrs := input.FilterAndValidate()
-		if valErrs.HasErrors() {
+		if !valErrs.Empty() {
 			errs.Children[fieldName] = valErrs
 		}
 		filteredGroup[fieldName] = filteredInput.(BasicInput)
