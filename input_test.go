@@ -86,7 +86,6 @@ func TestValidationErrorNotEmptyIfNotEmptyChildren(t *testing.T) {
 
 }
 
-
 func TestValidationErrorEmptyIfEmptyChildren(t *testing.T) {
 
 	valErr := NewValidationError(nil, map[string]*ValidationError{

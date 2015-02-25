@@ -17,9 +17,35 @@ type Validator interface {
 }
 
 //
-// A type for a validation error. Validation errors can have child
-// ValidationErrors. In this way, a tree of validation errors can be built
-// up, with the leaf nodes having `Error` string values.
+// A validation error. Validation errors are essentially trees of `error` slices.
+// Validation errors can contain child validation errors, allowing a n-level tree
+// of aggregate valiation results to be returned by Inputs.
+//
+// One might, for example, wish for the following JSON structure to be filtered and
+// validated:
+//
+//		[
+//			{
+//				"title": "validate me"
+//				"user": {
+//					"first_name": "Steve",
+//					"last_name": "Fortune",
+//					"profile_picture_url": "http://icecb.com"
+//				}
+//			},
+//			{
+//				"title": "validate me"
+//				"user": {
+//					"first_name": "John",
+//					"last_name": "Blake",
+//					"profile_picture_url": "http://icecb.com"
+//				}
+//			}
+//		]
+//
+// This way, we can filter, validate and return the aggregate validation result in 1
+// operation. The validation result might contain child results for each object in the
+// JSON structure.
 //
 type ValidationError struct {
 	Errors []error
@@ -45,7 +71,7 @@ func NewValidationError(errs []error, children map[string]*ValidationError) *Val
 }
 
 //
-//
+// Should return a string having formatted all of its errors and children
 //
 func (errs ValidationError) Error() (errStr string) {
 
@@ -72,7 +98,7 @@ func (errs ValidationError) Empty() (empty bool) {
 			}
 		}
 	}
-	
+
 	return
 }
 
