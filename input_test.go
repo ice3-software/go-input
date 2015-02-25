@@ -53,3 +53,49 @@ func TestValidaionErrorString(t *testing.T) {
 		t.Errorf("Expected `%q`, for `%q`", expErrStr, errStr)
 	}
 }
+
+func TestValidationErrorEmpty(t *testing.T) {
+
+	valErr := NewValidationError(nil, nil)
+
+	if !valErr.Empty() {
+		t.Errorf("Validation error should be empty")
+	}
+
+}
+
+func TestValidationErrorNotEmptyIfErrors(t *testing.T) {
+
+	valErr := NewValidationError([]error{errors.New("Error1")}, nil)
+
+	if valErr.Empty() {
+		t.Errorf("Validation error should not be empty")
+	}
+
+}
+
+func TestValidationErrorNotEmptyIfNotEmptyChildren(t *testing.T) {
+
+	valErr := NewValidationError(nil, map[string]*ValidationError{
+		"Child1": NewValidationError([]error{errors.New("Error1")}, nil),
+	})
+
+	if valErr.Empty() {
+		t.Errorf("Validation error should not be empty")
+	}
+
+}
+
+
+func TestValidationErrorEmptyIfEmptyChildren(t *testing.T) {
+
+	valErr := NewValidationError(nil, map[string]*ValidationError{
+		"EmptyChild1": NewValidationError(nil, nil),
+		"EmptyChild2": NewValidationError(nil, nil),
+	})
+
+	if !valErr.Empty() {
+		t.Errorf("Validation error should be empty")
+	}
+
+}

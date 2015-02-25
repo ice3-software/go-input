@@ -58,8 +58,22 @@ func (errs ValidationError) Error() (errStr string) {
 //
 // Checks whether the map contains any validation errors or children.
 //
-func (errs ValidationError) Empty() bool {
-	return len(errs.Errors) == 0 && len(errs.Children) == 0
+func (errs ValidationError) Empty() (empty bool) {
+
+	empty = true
+
+	if len(errs.Errors) != 0 {
+		empty = false
+	} else if len(errs.Children) != 0 {
+		for _, child := range errs.Children {
+			if !child.Empty() {
+				empty = false
+				break
+			}
+		}
+	}
+	
+	return
 }
 
 //
